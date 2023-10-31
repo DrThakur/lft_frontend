@@ -1,0 +1,627 @@
+import React, { useState } from "react";
+import employees from "../../../data/EmployeesData/EmployeesData";
+import Select from "react-select";
+import DialogBox from "./DialogBox";
+import axios from "axios";
+
+const EmployeeOption = ({ employee }) => (
+  <div className="flex items-center">
+    <img
+      src={employee.imageUrl}
+      alt={`${employee.name}'s profile`}
+      className="w-8 h-8 rounded-full mr-2"
+    />
+    <div>
+      <p className="font-medium">{employee.name}</p>
+      <p className="text-sm text-gray-700">
+        {employee.position} ({employee.code})
+      </p>
+    </div>
+  </div>
+);
+
+const DropdownForm = () => {
+  // const [requestType, setRequestType] = useState("");
+  // const [needAssetFor, setNeedAssetFor] = useState("");
+  // const [selectedAsset, setSelectedAsset] = useState("");
+  // const [description, setDescription] = useState("");
+  // const [hasManagerApproval, setHasManagerApproval] = useState(false);
+  // const [selectedPriority, setSelectedPriority] = useState("");
+  // const [managerName, setManagerName] = useState("");
+  // const [selectedIssue, setSelectedIssue] = useState("");
+
+  const [formData, setFormData] = useState({
+    requestType: "",
+    assetRequiredFor: "",
+    requestFor: "",
+    requirementDetails: "",
+    approvedByManager: false,
+    managerName: "",
+    issueType: "",
+    issueDescription: "",
+    priority: "",
+  });
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  // const [isFormComplete, setIsFormComplete] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogVisibleDuration, setDialogVisibleDuration] = useState(5000); // 5000 milliseconds (5 seconds)
+  const [ticketDetails, setTicketDetails] = useState({
+    ticketId: "",
+    issue: "",
+    submissionTime: null,
+  });
+
+  // const handleRequestTypeChange = (e) => {
+  //   const selectedRequestType = e.target.value;
+  //   setRequestType(selectedRequestType);
+
+  //   if (selectedRequestType !== "Request Something") {
+  //     setNeedAssetFor("");
+  //     setSelectedAsset("");
+  //     setDescription("");
+  //     setHasManagerApproval(false);
+  //     setManagerName("");
+  //   } else {
+  //     setSelectedIssue("");
+  //     setDescription("");
+  //   }
+
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+
+  // const handleNeedAssetForChange = (e) => {
+  //   setNeedAssetFor(e.target.value);
+  //   setSelectedAsset("");
+  //   setDescription("");
+  //   setHasManagerApproval(false);
+  //   setManagerName("");
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+
+  // const handleAssetSelect = (asset) => {
+  //   setSelectedAsset(asset);
+  //   setDescription("");
+  //   setHasManagerApproval(false);
+  //   setManagerName("");
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+
+  // const handleDescriptionChange = (e) => {
+  //   setDescription(e.target.value);
+  //   setHasManagerApproval(false);
+  //   setManagerName("");
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+
+  // const handleManagerApprovalChange = (e) => {
+  //   setHasManagerApproval(e.target.value === "Yes");
+  //   setManagerName("");
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+
+  // const handleManagerNameChange = (selectedOption) => {
+  //   setManagerName(selectedOption.value);
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+  // const handleIssueChange = (issue) => {
+  //   setSelectedIssue(issue);
+  //   setDescription("");
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+  // const handlePriorityChange = (priority) => {
+  //   setSelectedPriority(priority);
+  //   setIsFormSubmitted(false);
+  //   setIsFormComplete(false);
+  // };
+  const isFormComplete = () => {
+    const {
+      requestType,
+      assetRequiredFor,
+      requestFor,
+      requirementDetails,
+      approvedByManager,
+      managerName,
+      issueType,
+      issueDescription,
+      priority,
+    } = formData;
+
+    if (requestType === "Request Something") {
+      if (
+        assetRequiredFor &&
+        requestFor &&
+        requirementDetails &&
+        (!approvedByManager || (approvedByManager && managerName)) &&
+        priority
+      ) {
+        return true;
+      }
+    } else if (requestType === "Report Something") {
+      if (issueType && issueDescription && priority) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const handleFormChange = (field, value) => {
+    if (field === "approvedByManager") {
+      setFormData((prevData) => ({
+        ...prevData,
+        approvedByManager: value === "Yes",
+      }));
+    } else if (field === "managerName") {
+      setFormData((prevData) => ({
+        ...prevData,
+        managerName: value.value, // Use value.value to get the selected manager's name
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [field]: value,
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Extracting the form data
+    const {
+      requestType,
+      assetRequiredFor,
+      requestFor,
+      requirementDetails,
+      approvedByManager,
+      managerName,
+      issueType,
+      issueDescription,
+      priority,
+    } = formData;
+
+    let isComplete = true;
+
+    if (requestType === "Request Something") {
+      if (!assetRequiredFor || !requestFor || !requirementDetails) {
+        isComplete = false;
+      }
+      if (approvedByManager && !managerName) {
+        isComplete = false;
+      }
+      if (!priority) {
+        isComplete = false;
+      }
+    } else if (requestType === "Report Something") {
+      if (!issueType || !issueDescription || !priority) {
+        isComplete = false;
+      }
+    } else {
+      isComplete = false;
+    }
+
+    if (isComplete) {
+      setIsFormSubmitted(true);
+
+      // Making Post request usin axios for form submission
+      try {
+        const response = await axios.post("http://localhost:8002/tickets", {
+          requestType,
+          assetRequiredFor,
+          requestFor,
+          requirementDetails,
+          approvedByManager,
+          managerName,
+          issueType,
+          issueDescription,
+          priority,
+        });
+
+        console.log(response);
+        // Simulate a backend response
+        const mockTicketId = Math.floor(Math.random() * 1000) + 1;
+        const submissionDetails = {
+          ticketId: `TICKET-${mockTicketId}`,
+          issue: requestType === "Report Something" ? issueType : requestFor,
+          submissionTime: new Date(),
+        };
+        setTicketDetails(submissionDetails);
+        setShowDialog(true);
+        setDialogVisibleDuration(5000);
+      } catch (error) {
+        // Handle error here
+        console.error("Error submitting form:", error);
+      }
+    } else {
+      // setIsFormComplete(true);
+    }
+
+    // Resetting the form fields
+    setFormData({
+      requestType: "",
+      assetRequiredFor: "",
+      requestFor: "",
+      requirementDetails: "",
+      approvedByManager: false,
+      managerName: "",
+      issueType: "",
+      issueDescription: "",
+      priority: "",
+    });
+    // setRequestType("");
+    // setNeedAssetFor("");
+    // setSelectedAsset("");
+    // setDescription("");
+    // setHasManagerApproval(false);
+    // setManagerName("");
+    // setIsFormSubmitted(false);
+    // setIsFormComplete(false);
+    // setSelectedIssue("");
+    // setSelectedPriority("");
+  };
+
+  const employeeOptions = employees.map((employee) => ({
+    value: employee.name,
+    label: <EmployeeOption employee={employee} />,
+  }));
+
+  return (
+    <div className="w-full bg-white shadow-lg rounded-lg p-4 px-8">
+      <form onSubmit={handleSubmit}>
+        <div className="flex flex-row justify-center items-center mb-4">
+          <label htmlFor="requestType" className="w-full mb-2 font-medium">
+            Request Type:
+          </label>
+          <select
+            id="requestType"
+            value={formData.requestType}
+            onChange={(e) => handleFormChange("requestType", e.target.value)}
+            className="w-full border rounded-md p-2 cursor-pointer"
+          >
+            <option value="">-- Select Request Type --</option>
+            <option value="Request Something">Request Something</option>
+            <option value="Report Something">Report Something</option>
+          </select>
+        </div>
+        {formData.requestType && (
+          <div
+            className={`p-2 rounded-lg shadow-md text-center mx-auto mb-2 ${
+              formData.requestType === "Request Something"
+                ? "bg-pink-500"
+                : "bg-yellow-500"
+            }`}
+          >
+            <p className="text-lg text-center font-semibold text-white">
+              {formData.requestType.toUpperCase()}
+            </p>
+          </div>
+        )}
+
+        {formData.requestType === "Request Something" ? (
+          <>
+            <div className=" flex flex-row justify-between items-center mb-4">
+              <label className="w-auto mb-2 font-medium">
+                Asset required for:
+              </label>
+              <div className="flex flex-row justify-between items-center mx-auto">
+                <label
+                  htmlFor="needAssetForSelf"
+                  className="inline-flex items-center mr-2"
+                >
+                  <input
+                    type="radio"
+                    id="needAssetForSelf"
+                    name="needAssetFor"
+                    value="Self"
+                    checked={formData.assetRequiredFor === "Self"}
+                    onChange={(e) =>
+                      handleFormChange("assetRequiredFor", e.target.value)
+                    }
+                    className="cursor-pointer mr-2"
+                    required
+                  />
+                  Self
+                </label>
+                <label
+                  htmlFor="needAssetForProject"
+                  className="inline-flex items-center mr-2"
+                >
+                  <input
+                    type="radio"
+                    id="needAssetForProject"
+                    name="needAssetFor"
+                    value="Project"
+                    checked={formData.assetRequiredFor === "Project"}
+                    onChange={(e) =>
+                      handleFormChange("assetRequiredFor", e.target.value)
+                    }
+                    className="cursor-pointer mr-2"
+                    required
+                  />
+                  Project
+                </label>
+              </div>
+            </div>
+
+            {formData.assetRequiredFor && (
+              <div className="flex flex-row justify-evenly items-center mb-4">
+                <label
+                  htmlFor="selectedAsset"
+                  className="w-full mb-2 font-medium"
+                >
+                  Request For:
+                </label>
+                <select
+                  id="selectedAsset"
+                  name="requestFor"
+                  value={formData.requestFor}
+                  onChange={(e) =>
+                    handleFormChange("requestFor", e.target.value)
+                  }
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="">-- Select Asset --</option>
+                  <option value="Laptop">Laptop</option>
+                  <option value="Desktop">Desktop</option>
+                  <option value="Accessories">Accessories</option>
+                  <option value="Consumables">Consumables</option>
+                  <option value="Licence">Licence</option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+            )}
+
+            {formData.requestFor && (
+              <div className="flex flex-row justify-center items-center mb-4">
+                <label
+                  htmlFor="description"
+                  className="w-full mb-2 font-medium"
+                >
+                  Brief your requirement:
+                </label>
+                <textarea
+                  id="description"
+                  name="requirementDetails"
+                  value={formData.requirementDetails}
+                  onChange={(e) =>
+                    handleFormChange("requirementDetails", e.target.value)
+                  }
+                  rows={4}
+                  className="w-full border rounded-md p-2"
+                />
+              </div>
+            )}
+
+            {formData.requirementDetails && (
+              <div className="flex flex-row justify-center items-center mb-4">
+                <label className="w- mb-2 font-medium">
+                  Approved By Manager:
+                </label>
+                <div className="flex flex-row justify-between items-center mx-auto">
+                  <label
+                    htmlFor="managerApprovalYes"
+                    className="inline-flex items-center mr-2"
+                  >
+                    <input
+                      type="radio"
+                      id="managerApprovalYes"
+                      name="approvedByManager"
+                      value="Yes"
+                      checked={formData.approvedByManager}
+                      onChange={(e) =>
+                        handleFormChange(
+                          "approvedByManager",
+                          e.target.value === "Yes" ? "Yes" : "No"
+                        )
+                      }
+                      className="cursor-pointer mr-2"
+                    />
+                    Yes
+                  </label>
+                  <label
+                    htmlFor="managerApprovalNo"
+                    className="inline-flex items-center mr-2"
+                  >
+                    <input
+                      type="radio"
+                      id="managerApprovalNo"
+                      name="approvedByManager"
+                      value="No"
+                      checked={formData.approvedByManager}
+                      onChange={(e) =>
+                        handleFormChange(
+                          "approvedByManager",
+                          e.target.value === "Yes" ? "Yes" : "No"
+                        )
+                      }
+                      className="cursor-pointer mr-2"
+                    />
+                    No
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {formData.approvedByManager && (
+              <div className="flex flex-row justify-center items-center mb-4">
+                <label
+                  htmlFor="managerName"
+                  className="w-full mb-2 font-medium"
+                >
+                  Manager's Name:
+                </label>
+                <Select
+                  id="managerName"
+                  value={{
+                    value: formData.managerName,
+                    label: formData.managerName,
+                  }}
+                  onChange={(selectedOption) =>
+                    handleFormChange("managerName", selectedOption)
+                  }
+                  options={employeeOptions}
+                  className="w-full border rounded-md mt-2"
+                />
+              </div>
+            )}
+            {formData.managerName && (
+              <div className="flex flex-row justify-evenly items-center mb-4">
+                <label
+                  htmlFor="selectedPriority"
+                  className="w-full mb-2 font-medium"
+                >
+                  Set Priority:
+                </label>
+                <select
+                  id="selectedPriority"
+                  name="priority"
+                  value={formData.priority}
+                  onChange={(e) => handleFormChange("priority", e.target.value)}
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="">-- Select Issue --</option>
+                  <option value="High Priority">High Priority</option>
+                  <option value="Medium Priority">Medium Priority</option>
+                  <option value="Low Priority">Low Priority</option>
+                </select>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {formData.requestType === "Report Something" && (
+              <div className="flex flex-row justify-evenly items-center mb-4">
+                <label
+                  htmlFor="selectedAsset"
+                  className="w-full mb-2 font-medium"
+                >
+                  Issue Related To:
+                </label>
+                <select
+                  id="selectedIssue"
+                  name="issueType"
+                  value={formData.issueType}
+                  onChange={(e) =>
+                    handleFormChange("issueType", e.target.value)
+                  }
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="">-- Select Issue --</option>
+                  <option value="Software Related">Software Related</option>
+                  <option value="Network Related">Network Related</option>
+                  <option value="LFT Resource Related">
+                    LFT Resource Realted
+                  </option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+            )}
+            {formData.issueType === "LFT Resource Related" && (
+              <div>
+                <p className="text-sm text-right mb-2 -mt-2">
+                  (For Mantis, SVN, Crush FTP, FTP Access Related etc...)
+                </p>
+              </div>
+            )}
+            {formData.issueType && (
+              <div className="flex flex-row justify-center items-center mb-4">
+                <label
+                  htmlFor="description"
+                  className="w-full mb-2 font-medium"
+                >
+                  Brief your requirement:
+                </label>
+                <textarea
+                  id="description"
+                  name="issueDescription"
+                  value={formData.issueDescription}
+                  onChange={(e) =>
+                    handleFormChange("issueDescription", e.target.value)
+                  }
+                  rows={4}
+                  className="w-full border rounded-md p-2"
+                />
+              </div>
+            )}
+            {formData.issueDescription && (
+              <div className="flex flex-row justify-evenly items-center mb-4">
+                <label
+                  htmlFor="selectedPriority"
+                  className="w-full mb-2 font-medium"
+                >
+                  Set Priority:
+                </label>
+                <select
+                  id="selectedPriority"
+                  name="priority"
+                  value={formData.priority}
+                  onChange={(e) => handleFormChange("priority", e.target.value)}
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="">-- Select Issue --</option>
+                  <option value="High Priority">High Priority</option>
+                  <option value="Medium Priority">Medium Priority</option>
+                  <option value="Low Priority">Low Priority</option>
+                </select>
+              </div>
+            )}
+          </>
+        )}
+
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            // disabled={
+            //   !formData.requestType ||
+            //   (!formData.requestFor &&
+            //     formData.requestType === "Request Something") ||
+            //   (!formData.requirementDetails && formData.requestFor) ||
+            //   (formData.requestType === "Report Something" &&
+            //     !formData.issueType) ||
+            //   !formData.issueDescription ||
+            //   !formData.priority ||
+            //   (formData.approvedByManager && !formData.managerName) ||
+            //   !formData.priority
+            // }
+            disabled={!isFormComplete()}
+            onClick={handleSubmit}
+            className="mt-4 p-2 bg-green-500 text-white rounded-md cursor-pointer"
+          >
+            Submit
+          </button>
+        </div>
+
+        {isFormComplete && (
+          <p className="text-red-500 mt-2">
+            Please fill in all the required fields.
+          </p>
+        )}
+
+        {isFormSubmitted && (
+          <p className="text-green-500 mt-2">Form submitted successfully!</p>
+        )}
+        {showDialog && (
+          <DialogBox
+            ticketDetails={ticketDetails}
+            onClose={() => setShowDialog(false)}
+          />
+        )}
+        {showDialog &&
+          dialogVisibleDuration > 0 &&
+          setTimeout(() => {
+            setShowDialog(false);
+            setDialogVisibleDuration(0); // Reset the duration
+          }, dialogVisibleDuration)}
+      </form>
+    </div>
+  );
+};
+
+export default DropdownForm;
