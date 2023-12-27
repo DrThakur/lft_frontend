@@ -22,6 +22,8 @@ const TicketThread = ({
   //   return members.find((member) => member._id === senderId) || null;
   // };
 
+  const apiURL = process.env.REACT_APP_API_URL
+
   return (
     <div className="bg-white rounded-lg h-80 overflow-y-scroll ">
       <div
@@ -32,7 +34,7 @@ const TicketThread = ({
         } `}
       >
         <img
-          src={`http://localhost:8002${ticket.createdBy?.profileImageURL}`}
+          src={apiURL+`${ticket.createdBy?.profileImageURL}`}
           alt="user avatar"
           className="w-32 h-32 rounded-full ml-3 mt-2"
         />
@@ -67,7 +69,7 @@ const TicketThread = ({
             ref={scrollRef}
           >
             <img
-              src={`http://localhost:8002${message.senderImage}`}
+              src={apiURL+`${message.senderImage}`}
               alt="user avatar"
               className="w-32 h-32 rounded-full ml-3 mt-2"
             />

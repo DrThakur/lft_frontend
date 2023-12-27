@@ -35,12 +35,14 @@ const UserTicketTable = ({ title }) => {
   //   initFilters();
   // }, []);
 
+  const apiURL = process.env.REACT_APP_API_URL
+
   console.log("My uuuuuser id", user._id);
   useEffect(() => {
     const fetchTickets = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8002/tickets/createdBy/${user._id}`
+          apiURL+`/tickets/createdBy/${user._id}`
         );
         console.log("My Ticket Responses", res);
         setTickets(res.data);
@@ -202,7 +204,7 @@ const UserTicketTable = ({ title }) => {
         <div className="flex flex-row items-center justify-start">
           <img
             alt={createdBy.fullName}
-            src={`http://localhost:8002${createdBy.profileImageURL}`}
+            src={apiURL+`${createdBy.profileImageURL}`}
             width="40"
             height="40"
           />
@@ -237,7 +239,7 @@ const UserTicketTable = ({ title }) => {
           <div className="flex flex-row  items-center justify-start">
             <img
               alt={assignedTo.fullName}
-              src={`http://localhost:8002${assignedTo.profileImageURL}`}
+              src={apiURL+`${assignedTo.profileImageURL}`}
               width="40"
               height="40"
             />

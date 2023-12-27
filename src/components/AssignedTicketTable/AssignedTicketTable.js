@@ -36,6 +36,8 @@ const AssignedTicketTable = ({ user }) => {
 
   console.log("my logged Inuse", user);
 
+  const apiURL = process.env.REACT_APP_API_URL
+
   const formatDate = (date) => {
     const options = {
       weekday: "short", // Mon
@@ -54,7 +56,7 @@ const AssignedTicketTable = ({ user }) => {
     const fetchTickets = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8002/tickets/assigned/${user._id}`
+          apiURL+`/tickets/assigned/${user._id}`
         );
         console.log("response data", res.data);
         setTickets(res.data);
@@ -197,7 +199,7 @@ const AssignedTicketTable = ({ user }) => {
         <div className="flex flex-row items-center justify-start">
           <img
             alt={createdBy.fullName}
-            src={`http://localhost:8002${createdBy.profileImageURL}`}
+            src={apiURL+`${createdBy.profileImageURL}`}
             width="40"
             height="40"
           />
@@ -239,7 +241,7 @@ const AssignedTicketTable = ({ user }) => {
           <div className="flex flex-row  items-center justify-start">
             <img
               alt={assignedTo.fullName}
-              src={`http://localhost:8002${assignedTo.profileImageURL}`}
+              src={apiURL+`${assignedTo.profileImageURL}`}
               width="40"
               height="40"
             />
@@ -461,7 +463,7 @@ const AssignedTicketTable = ({ user }) => {
 
       //Pathch request for updatingh ticket
       const res = await axios.patch(
-        `http://localhost:8002/tickets/${ticketObjId}`,
+        apiURL+`/tickets/${ticketObjId}`,
         assignTicketTo
       );
       console.log(`Ticket ${ticketObjId} assigned successfully!`, res);

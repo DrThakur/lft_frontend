@@ -38,10 +38,12 @@ const TicketTableByStatus = ({ title, statuses }) => {
   //   TicketService.getTicketsMini().then((data) => setTickets(data));
   //   initFilters();
   // }, []);
+
+  const apiURL = process.env.REACT_APP_API_URL
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await axios.get(`http://localhost:8002/tickets`);
+        const res = await axios.get(apiURL+`/tickets`);
         console.log("My Ticket Responses", res);
         const filteredTickets = res.data.filter((ticket) =>
           statuses.includes(ticket.status)
@@ -202,7 +204,7 @@ const TicketTableByStatus = ({ title, statuses }) => {
         <div className="flex flex-row items-center justify-start">
           <img
             alt={createdBy.fullName}
-            src={`http://localhost:8002${createdBy.profileImageURL}`}
+            src={apiURL+`${createdBy.profileImageURL}`}
             width="40"
             height="40"
           />
@@ -244,7 +246,7 @@ const TicketTableByStatus = ({ title, statuses }) => {
           <div className="flex flex-row  items-center justify-start">
             <img
               alt={assignedTo.fullName}
-              src={`http://localhost:8002${assignedTo.profileImageURL}`}
+              src={apiURL+`${assignedTo.profileImageURL}`}
               width="40"
               height="40"
             />

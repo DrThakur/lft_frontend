@@ -15,6 +15,9 @@ const UserProfile = ({ user }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const toast = useRef(null);
 
+
+  const apiURL = process.env.REACT_APP_API_URL
+
   const handleSave = () => {
     // Perform save logic here
     setIsEditMode(false);
@@ -30,7 +33,7 @@ const UserProfile = ({ user }) => {
     console.log("My Profile formadata", formData);
     try {
       const response = await axios.post(
-        "http://localhost:8002/users/uploadProfileImage",
+        apiURL+ "/users/uploadProfileImage",
         formData,
         {
           headers: {
@@ -71,7 +74,7 @@ const UserProfile = ({ user }) => {
       <div className="w-4/12 pr-8 bg-white rounded shadow text-center">
         <div className="flrx flex-col justify-cemter items-center mb-4 mt-6">
           <img
-            src={`http://localhost:8002${user.profileImageURL}`}
+            src={apiURL+`${user.profileImageURL}`}
             alt="User Profile"
             className="w-32 h-32 rounded-full mx-auto"
           />

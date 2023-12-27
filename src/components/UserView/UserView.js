@@ -20,10 +20,12 @@ const UserView = ({ userId }) => {
   //   profileImage: "https://example.com/profile.jpg", // Replace with actual image URL
   // };
 
+  const apiURL = process.env.REACT_APP_API_URL
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:8002/users/${userId}`);
+        const res = await axios.get(apiURL+`/users/${userId}`);
         console.log("specific user data", res.data);
         setUser(res.data);
       } catch (error) {
@@ -83,7 +85,7 @@ const UserView = ({ userId }) => {
       <div className="w-5/12 pl-8 border-l border-gray-300">
         <div className="flex flex-col items-center space-y-4">
           <img
-            src={`http://localhost:8002${user.profileImageURL}`}
+            src={apiURL+`${user.profileImageURL}`}
             alt="Profile"
             className="w-48 h-48 rounded-full object-cover"
           />

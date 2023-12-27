@@ -51,10 +51,12 @@ const Table = () => {
     );
   };
 
+  const apiURL = process.env.REACT_APP_API_URL
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:8002/users");
+        const res = await axios.get(apiURL+ "/users");
         setUsers(res.data);
       } catch (error) {
         console.error("Error", error);
@@ -132,7 +134,7 @@ const Table = () => {
         <div className="flex flex-row items-center justify-start">
           <img
             alt={employee.fullName}
-            src={`http://localhost:8002${employee.profileImageURL}`}
+            src={apiURL+`${employee.profileImageURL}`}
             width="32"
             height="32"
           />
@@ -495,7 +497,7 @@ const Table = () => {
         <FileUpload
           mode="basic"
           name="file"
-          url="http://localhost:8002/users/importFile"
+          url= {`${apiURL}/users/importFile`}
           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
           maxFileSize={1000000}
           onUpload={onUpload}

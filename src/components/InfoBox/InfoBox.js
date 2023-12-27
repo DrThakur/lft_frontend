@@ -9,10 +9,12 @@ const InfoBox = ({ categories, title }) => {
   const [tickets, setTickets] = useState([]);
   const navigate = useNavigate();
 
+  const apiURL = process.env.REACT_APP_API_URL
+
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await axios.get(`http://localhost:8002/tickets`);
+        const res = await axios.get(apiURL+`/tickets`);
         console.log("My Dashboard Ticket Responses", res);
         setTickets(res.data);
       } catch (error) {

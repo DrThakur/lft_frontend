@@ -33,6 +33,8 @@ const DropdownForm = () => {
 
   console.log("My Special Context User", user);
 
+  const apiURL = process.env.REACT_APP_API_URL
+
   const isButtonDisabled =
     !location ||
     (location && !requestType) ||
@@ -312,7 +314,7 @@ const DropdownForm = () => {
       // Making Post request usin axios for form submission
       try {
         const response = await axios.post(
-          "http://localhost:8002/tickets",
+          apiURL+"/tickets",
           formData
         );
 
@@ -339,7 +341,7 @@ const DropdownForm = () => {
 
         // Make a POST request to create a conversation
         const conversationResponse = await axios.post(
-          "http://localhost:8002/conversations",
+          apiURL+"/conversations",
           conversationData
         );
         console.log("conversation response", conversationResponse);
@@ -355,7 +357,7 @@ const DropdownForm = () => {
 
         // Make a POST request to create the first message
         const firstMessageResponse = await axios.post(
-          "http://localhost:8002/messages",
+          apiURL+"/messages",
           firstMessageData
         );
         console.log("My first Ever Message", firstMessageResponse);
@@ -387,7 +389,7 @@ const DropdownForm = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:8002/users");
+        const res = await axios.get(apiURL+"/users");
         console.log(res);
         // setTickets(res.data);
         console.log(res.data);

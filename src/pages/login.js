@@ -21,13 +21,17 @@ const Login = () => {
   const passwordRef = useRef();
   const { dispatch, isFetching } = useContext(Context);
 
+
+  const apiURL = process.env.REACT_APP_API_URL
+
+  console.log("My url", apiURL)
   const handleSignin = async (e) => {
     e.preventDefault();
     dispatch({ type: "LOGIN_START" });
     console.log("Email", userRef.current.value);
     console.log("Pass", passwordRef.current.value);
     try {
-      const res = await axios.post("http://localhost:8002/users/login", {
+      const res = await axios.post(apiURL+"/users/login", {
         email: userRef.current.value,
         password: passwordRef.current.value,
       });

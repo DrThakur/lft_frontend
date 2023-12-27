@@ -1,9 +1,11 @@
 import React from "react";
 
+const apiURL = process.env.REACT_APP_API_URL
+
 const EmployeeEmailOption = ({ employee }) => (
   <div className="flex items-center">
     <img
-      src={`http://localhost:8002${employee.profileImageURL}`}
+      src={apiURL+`${employee.profileImageURL}`}
       alt={`${employee.fullName}'s profile`}
       className="w-10 h-10 rounded-full mr-2"
     />

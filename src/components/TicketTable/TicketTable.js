@@ -35,6 +35,8 @@ const TicketTable = ({ user }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
 
   console.log("my logged Inuse", user);
+  
+  const apiURL = process.env.REACT_APP_API_URL
 
   const formatDate = (date) => {
     const options = {
@@ -53,7 +55,7 @@ const TicketTable = ({ user }) => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await axios.get("http://localhost:8002/tickets");
+        const res = await axios.get(apiURL+"/tickets");
         console.log("response data", res.data);
         setTickets(res.data);
       } catch (error) {
@@ -195,7 +197,7 @@ const TicketTable = ({ user }) => {
         <div className="flex flex-row items-center justify-start">
           <img
             alt={createdBy.fullName}
-            src={`http://localhost:8002${createdBy.profileImageURL}`}
+            src={apiURL+`${createdBy.profileImageURL}`}
             width="40"
             height="40"
           />
@@ -225,7 +227,7 @@ const TicketTable = ({ user }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8002/messages`,
+        apiURL+`/messages`,
         messageData
       );
       console.log("resojnse", response.data);
@@ -267,7 +269,7 @@ const TicketTable = ({ user }) => {
           <div className="flex flex-row  items-center justify-start">
             <img
               alt={assignedTo.fullName}
-              src={`http://localhost:8002${assignedTo.profileImageURL}`}
+              src={apiURL+`${assignedTo.profileImageURL}`}
               width="40"
               height="40"
             />
@@ -490,7 +492,7 @@ const TicketTable = ({ user }) => {
 
       //Pathch request for updatingh ticket
       const res = await axios.patch(
-        `http://localhost:8002/tickets/${ticketObjId}`,
+        apiURL+`/tickets/${ticketObjId}`,
         assignTicketTo
       );
       console.log(`Ticket ${ticketObjId} assigned successfully!`, res);

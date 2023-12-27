@@ -16,7 +16,8 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import jsPDF from "jspdf";
 
-// const socket = io.connect("http://localhost:8002");
+// const socket = io.connect(apiURL);
+const apiURL = process.env.REACT_APP_API_URL
 
 const TicketView = ({ ticketObjId, user }) => {
   const [selectedStatus, setSelectedStatus] = useState("select");
@@ -86,7 +87,7 @@ const TicketView = ({ ticketObjId, user }) => {
   useEffect(() => {
     const fetchEmployeeEmails = async () => {
       try {
-        const res = await axios.get("http://localhost:8002/users");
+        const res = await axios.get(apiURL+"/users");
         // console.log(res);
         const employees = res.data;
         const options = employees.map((employee) => ({
@@ -114,7 +115,7 @@ const TicketView = ({ ticketObjId, user }) => {
     const fetchTickets = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8002/tickets/${ticketObjId}`
+          apiURL+`/tickets/${ticketObjId}`
         );
         // console.log("specific ticket data", res.data);
         const memberIds = res.data.members;
@@ -122,7 +123,7 @@ const TicketView = ({ ticketObjId, user }) => {
 
         // Send a POST request to fetch user details by user IDs
         const userDetailsRes = await axios.get(
-          "http://localhost:8002/users/usersByIds",
+          apiURL+"/users/usersByIds",
           { params: { userIds: memberIds } } // Pass the memberIds as query parameters
         );
 
@@ -147,7 +148,7 @@ const TicketView = ({ ticketObjId, user }) => {
     const fetchTicketCreator = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8002/users/${ticket.createdBy._id}`
+          apiURL+`/users/${ticket.createdBy._id}`
         );
 
         setTicketCreator(res.data);
@@ -162,7 +163,7 @@ const TicketView = ({ ticketObjId, user }) => {
     const getMessages = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8002/messages/${ticketObjId}`
+          apiURL+`/messages/${ticketObjId}`
         );
 
         const latestMessag = response.data[response.data.length - 1];
@@ -197,7 +198,7 @@ const TicketView = ({ ticketObjId, user }) => {
 
       try {
         const response = await axios.post(
-          `http://localhost:8002/messages`,
+          apiURL+`/messages`,
           messageData
         );
 
@@ -224,7 +225,7 @@ const TicketView = ({ ticketObjId, user }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8002/messages`,
+        apiURL+`/messages`,
         messageData
       );
 
@@ -249,7 +250,7 @@ const TicketView = ({ ticketObjId, user }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8002/messages`,
+        apiURL+`/messages`,
         messageData
       );
 
@@ -276,7 +277,7 @@ const TicketView = ({ ticketObjId, user }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8002/messages`,
+        apiURL+`/messages`,
         messageData
       );
 
@@ -292,7 +293,7 @@ const TicketView = ({ ticketObjId, user }) => {
   }, [messages]);
 
   useEffect(() => {
-    const socket = io("http://localhost:8002"); // Replace with your server's URL
+    const socket = io(apiURL); // Replace with your server's URL
 
     socket.emit("roomConnect", ticketObjId);
 
@@ -361,7 +362,7 @@ const TicketView = ({ ticketObjId, user }) => {
         status = "Closed";
       }
       const response = await axios.patch(
-        `http://localhost:8002/tickets/${ticketObjId}`,
+        apiURL+`/tickets/${ticketObjId}`,
         { status: status, user: user }
       );
       console.log("my status change response", response.data);
@@ -413,7 +414,7 @@ const TicketView = ({ ticketObjId, user }) => {
   const handleDeleteTicket = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:8002/tickets/${ticketObjId}`
+        apiURL+`/tickets/${ticketObjId}`
       );
       console.log(response);
       navigate("/all-tickets");
@@ -430,7 +431,7 @@ const TicketView = ({ ticketObjId, user }) => {
     // Once the image is successfully uploaded:
     try {
       const response = await axios.patch(
-        `http://localhost:8002/tickets/${ticketObjId}`,
+        apiURL+`/tickets/${ticketObjId}`,
         { approvedByManager: "Yes", approvedBy: user.fullName }
       );
       // Handle the success response, update the state, or show a success message
@@ -450,7 +451,7 @@ const TicketView = ({ ticketObjId, user }) => {
 
       // Make a POST request to your backend API
       const response = await axios.post(
-        `http://localhost:8002/addMembersToTicket`,
+        apiURL+`/addMembersToTicket`,
         {
           ticketId: ticketObjId,
           newMembers: newMembersEmails,
@@ -486,7 +487,7 @@ const TicketView = ({ ticketObjId, user }) => {
       );
       // Make a DELETE request to the backend to remove the email from the ticket members.
       await axios.delete(
-        `http://localhost:8002/tickets/${ticketObjId}/members/${memberId}`
+        apiURL+`/tickets/${ticketObjId}/members/${memberId}`
       );
 
       toast.success(
@@ -518,7 +519,7 @@ const TicketView = ({ ticketObjId, user }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8002/send",
+        apiURL+"/send",
         emailData
       );
 
@@ -534,7 +535,7 @@ const TicketView = ({ ticketObjId, user }) => {
   useEffect(() => {
     const fetchSLA = async () => {
       try {
-        const response = await axios.get("http://localhost:8002/slas");
+        const response = await axios.get(apiURL+"/slas");
         setSlas(response.data);
       } catch (error) {
         console.error("Errro", error);

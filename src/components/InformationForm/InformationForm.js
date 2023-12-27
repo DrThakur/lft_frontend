@@ -23,6 +23,9 @@ const InformationForm = () => {
     notes: "",
   });
 
+
+  const apiURL = process.env.REACT_APP_API_URL
+
   const handleInputChange = (event) => {
     const { name, type, checked, files } = event.target;
     let newValue;
@@ -46,7 +49,7 @@ const InformationForm = () => {
     // Handle form submission logic here
     console.log("My User Creation form Data", formData);
     try {
-      const res = await axios.post("http://localhost:8002/users", formData);
+      const res = await axios.post(apiURL+"/users", formData);
       console.log(res);
       // Reset the form after successful submission
       setFormData({

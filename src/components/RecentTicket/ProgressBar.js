@@ -17,6 +17,9 @@ const ProgressBar = ({ user }) => {
   //   // Return the formatted date with uppercase month abbreviation and desired format
   //   return `${day} ${capitalizedMonth} ${year}`;
   // };
+
+  const apiURL = process.env.REACT_APP_API_URL
+
   const formatDate = (date) => {
     const options = {
       weekday: "short", // Mon
@@ -35,7 +38,7 @@ const ProgressBar = ({ user }) => {
     const fetchLatestTicket = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8002/ticketByUserId?userId=${user._id}`
+          apiURL+`/ticketByUserId?userId=${user._id}`
         );
         const latestTicket = res.data[res.data.length - 1]; // Assuming the latest ticket is the first one
         console.log("My Latest Ticket Data", latestTicket);
